@@ -96,6 +96,8 @@ with open("costmanagement.json","r") as jsondata:
 count = 0
 blocks_map = {}
 table_blocks = []
+page_1 = []
+
 for i in jsonobject:
     
     blocks = i["Blocks"]
@@ -104,8 +106,39 @@ for i in jsonobject:
         if block['BlockType'] == "TABLE":
             # print(block["EntityTypes"])
             table_blocks.append(block)
+        if block['BlockType'] == "LINE":
+            pageno = block["Page"]
+            if pageno==1:
+             page_1.append(block)
+
     if len(table_blocks) <= 0:
         print("<b> NO Table FOUND </b>")
+
+# distance = []
+distanceval = []
+for index, table in enumerate(page_1):
+    # s = {}
+    # print(int(table["Geometry"]["BoundingBox"]["Left"]*594.9599609375))
+    dist =int(table["Geometry"]["BoundingBox"]["Left"]*594.9599609375)
+    # word = table["Text"]
+    # s[word] = dist
+    # distance.append(s)
+    distanceval.append(dist)
+
+dist = min(distanceval)
+# if min(distanceval) in [26,27]:
+#     mainhead = [31,32,33]
+#     subhead = [35,36,37]
+#     subval = [45,46,47]
+
+# if min(distanceval) in [29,30]:
+#     mainhead = [34,35,36]
+#     subhead =[39,40]
+#     subval = [50,51]
+mainhead = [4,5,6,7]
+subhead = [8,9,10,11]
+subval = [18,19,20,21,22]
+
 
 rows = {}
 chlid_relations = []
@@ -168,17 +201,17 @@ for index, table in enumerate(table_blocks):
                                                     while k < 1:
                                                         word = blocks_map[child_id]
                                                         if word['BlockType'] == 'WORD':
-                                                            val = int(word["Geometry"]["BoundingBox"]["Left"]*594.9599609375)
+                                                            val = (int(word["Geometry"]["BoundingBox"]["Left"]*594.9599609375)-dist)
                                                             # print(word['Text'])
                                                             # print(int(word["Geometry"]["BoundingBox"]["Left"]*594.9599609375),' ----------------',word["Text"])   
                                                             # print(word["Geometry"]["BoundingBox"]["Left"]) 
                                                             # with open("isnideloop.json",'a') as f:
                                                             #     f.write(json.dumps({word["Text"]:int(word["Geometry"]["BoundingBox"]["Left"]*594.9599609375)}))
-                                                            if val in [31,32,33]:
+                                                            if val in mainhead:
                                                                 type_word = "Main_head"
-                                                            if val in [35,36,37]:
+                                                            if val in subhead:
                                                                 type_word = "Sub_head"
-                                                            if val in [45,46,47]:
+                                                            if val in subval:
                                                                 type_word = "Sub_val"                                                               
                                                             if val in [29,30]:
                                                                 type_word = "Heading"                                                            
@@ -188,7 +221,7 @@ for index, table in enumerate(table_blocks):
                                                             rows[row_index]["type_word"] = type_word
                             else:
                                 rows[row_index]["type_word"] = "Sub_val"
-                                print(cell)
+                                # print(cell)
                                 # if "EntityTypes" in cell:
                                 #     print(cell["EntityTypes"])
                         else:

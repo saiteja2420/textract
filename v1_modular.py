@@ -24,6 +24,42 @@ def get_get_blocks_map_table_blocks(jsonobject):
             print("<b> NO Table FOUND </b>")
 
     return blocks_map,table_blocks
+page_1 = []
+for i in jsonobject:
+    
+    blocks = i["Blocks"]
+    for block in blocks:
+        if block['BlockType'] == "LINE":
+            pageno = block["Page"]
+            if pageno==1:
+                page_1.append(block)
+
+distanceval = []
+for index, table in enumerate(page_1):
+    # s = {}
+    # print(int(table["Geometry"]["BoundingBox"]["Left"]*594.9599609375))
+    dist =int(table["Geometry"]["BoundingBox"]["Left"]*594.9599609375)
+    # word = table["Text"]
+    # s[word] = dist
+    # distance.append(s)
+    distanceval.append(dist)
+
+print( min(distanceval))
+
+dist = min(distanceval)
+# if min(distanceval) in [26,27]:
+#     mainhead = [31,32,33]
+#     subhead = [35,36,37]
+#     subval = [45,46,47]
+
+# if min(distanceval) in [29,30]:
+#     mainhead = [34,35,36]
+#     subhead =[39,40]
+#     subval = [50,51]
+mainhead = [4,5,6,7]
+subhead = [8,9,10,11]
+subval = [18,19,20,21,22]
+
 
 def fetch_table_titles(blocks_map,table_blocks):
     table_titles = {}
@@ -86,14 +122,14 @@ def get_text_heading(blocks_map,table_blocks,table_titles):
                                                         while k < 1:
                                                             word = blocks_map[child_id]
                                                             if word['BlockType'] == 'WORD':
-                                                                val = int(word["Geometry"]["BoundingBox"]["Left"]*594.9599609375)
-                                                                if val in [31,32,33]:
+                                                                val = (int(word["Geometry"]["BoundingBox"]["Left"]*594.9599609375)-dist)
+                                                                if val in mainhead:
                                                                     # print(word['Text'])
                                                                 # print(int(word["Geometry"]["BoundingBox"]["Left"]*594.9599609375),' ----------------',word["Text"])    
                                                                     type_word = "Main_head"
-                                                                if val in [35,36,37]:
+                                                                if val in subhead:
                                                                     type_word = "Sub_head"
-                                                                if val in [45,46,47]:
+                                                                if val in subval:
                                                                     type_word = "Sub_val"                                                               
                                                                 if val in [29,30]:
                                                                     type_word = "Heading"                                                            
@@ -163,10 +199,10 @@ def get_text_heading(blocks_map,table_blocks,table_titles):
                         for col_index, text in cols.items():
 
                             if col_index == "type_word":
-                                if cols["type_word"] == 'null':
-                                    print(cols,"None")
+                                # if cols["type_word"] == 'null':
+                                    # print(cols,"None")
                                 if cols["type_word"] == "Main_head":
-                                    print(cols)
+                                    # print(cols)
         #                             #Ignore if main head has description or empty value
                                     if cols["1"] != "Description" and cols["1"] != "":
                                         
@@ -269,5 +305,5 @@ rows_list = get_text_heading(blocks_map,table_blocks,table_titles)
 # print(rows_list)
 # output_val = respose_parser(rows_list)
 # print(rows_list)
-with open("costmanagement_output_val_v1.json","w") as r:
+with open("costmanagement_outout_val_1.json","w") as r:
     r.write(json.dumps(rows_list))
